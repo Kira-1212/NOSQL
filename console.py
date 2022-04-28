@@ -1,10 +1,10 @@
-def fetch_high_rated_business(db ):
+def getMoviesbyID(db, value ):
     collection = db.movies
     movieId='movieId'
     lte='$lte'
     id="_id"
     title="title"
-    query= {movieId:{lte:4}}
+    query= {movieId: value}
     projection={title:1,id:0}
     cursor = collection.find(query, projection).limit(5)
     for record in cursor:
@@ -43,7 +43,9 @@ except:
         print("Could not connect to MongoDB")
 db = conn.moviesDB
 if option==4:
-    fetch_high_rated_business(db)
+    value = int(input('Enter movie id: '))
+
+    getMoviesbyID(db, value)
 if option==5:
     fetch_popular_business(db)
 
