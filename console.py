@@ -10,6 +10,7 @@ def getMoviesbyID(db, value ):
     cursor = collection.find(query, projection)
     for record in cursor:
             print(record)
+    print("============================================================================")
     menu(db)
 
 def getMoviesbyTitle(db, value, limitValue ):
@@ -22,6 +23,7 @@ def getMoviesbyTitle(db, value, limitValue ):
     cursor = collection.find(query, projection).limit(limitValue)
     for record in cursor:
             print(record)
+    print("============================================================================")
     menu(db)
 
 def getMoviesbyGenre(db, value, limitValue ):
@@ -33,6 +35,7 @@ def getMoviesbyGenre(db, value, limitValue ):
     cursor = collection.find(query, projection).limit(limitValue)
     for record in cursor:
         print(record)
+    print("============================================================================")
     menu(db)
 
 def getMoviesbyYear(db, value, limitValue ):
@@ -45,6 +48,7 @@ def getMoviesbyYear(db, value, limitValue ):
     cursor = collection.find(query, projection).limit(limitValue)
     for record in cursor:
         print(record)
+    print("============================================================================")
     menu(db)
 
 def addMovie(db, titleValue, genreValue ):
@@ -72,6 +76,7 @@ def addMovie(db, titleValue, genreValue ):
     cursor = collection.find(query, projection)
     for record in cursor:
         print(record)
+    print("============================================================================")
     menu(db)
 
 def getMoviesbyUserId(db, value , limitValue):
@@ -93,6 +98,7 @@ def getMoviesbyUserId(db, value , limitValue):
     cursor = collection.find(query, projection).limit(5)
     for record in cursor:
         print(record)
+    print("============================================================================")
     menu(db)
 
 def getHighlyRatedMovies(db, limitValue ):
@@ -115,6 +121,7 @@ def getHighlyRatedMovies(db, limitValue ):
     cursor = collection.find(query, projection)
     for record in cursor:
         print(record)
+    print("============================================================================")
     menu(db)
 
 def getLowlyRatedMovies(db, limitValue ):
@@ -137,6 +144,7 @@ def getLowlyRatedMovies(db, limitValue ):
     cursor = collection.find(query, projection)
     for record in cursor:
         print(record)
+    print("============================================================================")
     menu(db)
 
 def getMoviesbyRating(db, value, limitValue ):
@@ -158,6 +166,7 @@ def getMoviesbyRating(db, value, limitValue ):
     cursor = collection.find(query, projection)
     for record in cursor:
         print(record)
+    print("============================================================================")
     menu(db)
 
 def print_menu():
