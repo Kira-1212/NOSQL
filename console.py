@@ -3,7 +3,7 @@ from pymongo import MongoClient
 
 def getMoviesbyID(db, value ):
     collection = db.movies
-    movieId='movieId'
+    movieId="movieId"
     query= {movieId: value}
     projection={id:0}
     cursor = collection.find(query, projection)
@@ -138,7 +138,7 @@ def getLowlyRatedMovies(db, limitValue ):
         print(record)
     menu(db)
 
-def getMoviebyRating(db, value, limitValue ):
+def getMoviesbyRating(db, value, limitValue ):
     collection = db.ratings
     rating='rating'
     id="_id"
@@ -188,7 +188,7 @@ def menu(db):
         limitValue = int(input('Enter limit: '))
         getMoviesbyTitle(db, value, limitValue)
     if option==3:
-        value = int(input('Enter movie genre: '))
+        value = str(input('Enter movie genre: '))
         limitValue = int(input('Enter limit: '))
         getMoviesbyGenre(db, value, limitValue)
     if option==4:
@@ -212,7 +212,7 @@ def menu(db):
     if option==9:
         value = int(input('Enter Rating: '))
         limitValue = int(input('Enter limit: '))
-        getMoviebyRating(db, value, limitValue)
+        getMoviesbyRating(db, value, limitValue)
     if option==10:
         print("Exiting menu.....")
 
