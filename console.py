@@ -49,7 +49,7 @@ def getMoviesbyUserId(db, value ):
     projection={id:0, movieId :1}
     cursor = collection.find(query, projection).limit(5)
     for record in cursor:
-            record.split(":")
+            #record.split(":")
             print(record)
 
 def fetch_popular_business(db):
