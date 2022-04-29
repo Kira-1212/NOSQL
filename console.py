@@ -60,7 +60,9 @@ def addMovie(db, titleValue, genreValue ):
         title : titleValue,
         genres : genreValue
     }
-    print(insertValue)
+    insertRes = collection.insert_one(insertValue)
+    print("Inserted this value", insertRes)
+    
 
 def getMoviesbyUserId(db, value ):
     collection = db.tags
