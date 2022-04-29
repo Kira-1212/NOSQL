@@ -39,6 +39,19 @@ def getMoviesbyYear(db, value ):
     for record in cursor:
             print(record)
 
+def getMoviesbyUserId(db, value ):
+    collection = db.tags
+    id="_id"
+    userid="userId"
+    movieId='movieId'
+    movieIdList = []
+    query= {userid: value}
+    projection={id:0, movieId :1}
+    cursor = collection.find(query, projection).limit(5)
+    for record in cursor:
+            record.split(":")
+            print(record)
+
 def fetch_popular_business(db):
     collection = db.yelpc
     is_open="is_open"
