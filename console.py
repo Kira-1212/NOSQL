@@ -51,8 +51,7 @@ def addMovie(db, titleValue, genreValue ):
     genreValue = genreValue.split(",")
     movieIdValue = 0
     print(genreValue)
-    
-    cursor = collection.find().sort({"movieId" : pymongo.DESCENDING}).limit(1)
+    cursor = collection.find(sort=[("movieId", pymongo.DESCENDING)]).limit(1)
     for record in cursor:
         movieIdValue = int(record["movieId"]) + 1
     print(movieIdValue)
