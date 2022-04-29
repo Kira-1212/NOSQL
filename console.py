@@ -2,6 +2,7 @@ import pymongo
 from pymongo import MongoClient
 
 def getMoviesbyID(db, value ):
+    id="_id"
     collection = db.movies
     movieId="movieId"
     query= {movieId: value}
