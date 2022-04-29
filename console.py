@@ -10,8 +10,8 @@ def getMoviesbyTitle(db, value ):
     collection = db.movies
     id="_id"
     title="title"
-    value = "/" + value + "/"
-    query= {title: value}
+    qstr = "/" + str(value) + "/"
+    query= {title: qstr}
     projection={id:0}
     cursor = collection.find(query, projection).limit(5)
     for record in cursor:
@@ -31,7 +31,8 @@ def getMoviesbyYear(db, value ):
     collection = db.movies
     id="_id"
     title="title"
-    value = "/" + value + "/"
+    qstr = "/" + str(value) + "/"
+    print(qstr)
     query= {title: value}
     projection={id:0}
     cursor = collection.find(query, projection).limit(5)
@@ -85,6 +86,6 @@ if option==3:
 
 if option==4:
     value = int(input('Enter year: '))
-    getMoviesbyGenre(db, value)
+    getMoviesbyYear(db, value)
 
 
