@@ -76,7 +76,7 @@ if option==1:
 
     getMoviesbyID(db, value)
 if option==2:
-    value = int(input('Enter movie title: '))
+    value = str(input('Enter movie title: '))
     getMoviesbyTitle(db, value)
 
 
@@ -85,7 +85,7 @@ if option==3:
     getMoviesbyGenre(db, value)
 
 if option==4:
-    value = int(input('Enter year: '))
+    value = str(input('Enter year: '))
     getMoviesbyYear(db, value)
 
 
