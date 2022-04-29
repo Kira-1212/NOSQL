@@ -68,7 +68,7 @@ def fetch_popular_business(db):
 
 
 
-menu_option={1: 'Find Movie by ID', 2: 'Find Movie by Title',3: 'Find Movie by Genre.', 4: 'Find Movie by Year', 5:'Find Popular Businesses'}
+menu_option={1: 'Find Movie by ID', 2: 'Find Movie by Title',3: 'Find Movie by Genre.', 4: 'Find Movie by Year', 5:'Find Movie by User Id'}
 def print_menu(menu_option):
     for key, value in menu_option.items():
         print(key,".", value)
@@ -101,4 +101,7 @@ if option==4:
     value = str(input('Enter year: '))
     getMoviesbyYear(db, value)
 
+if option==4:
+    value = int(input('Enter User ID: '))
+    getMoviesbyUserId(db, value)
 
