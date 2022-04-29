@@ -50,11 +50,11 @@ def addMovie(db, titleValue, genreValue ):
     genres = 'genres'
     genreValue = genreValue.split(",")
     movieIdValue = 0
-    print(genreValue)
+    
     cursor = collection.find(sort=[("movieId", pymongo.DESCENDING)]).limit(1)
     for record in cursor:
         movieIdValue = int(record["movieId"]) + 1
-    print(movieIdValue)
+    
     insertValue ={
         movieId : movieIdValue,
         title : titleValue,
@@ -62,7 +62,12 @@ def addMovie(db, titleValue, genreValue ):
     }
     insertRes = collection.insert_one(insertValue)
     print("Inserted this value", insertRes)
-    
+    query= {movieId: movieIdValue}
+    projection={id:0}
+    cursor = collection.find(query, projection)
+    for record in cursor:
+            print(record)
+
 
 def getMoviesbyUserId(db, value ):
     collection = db.tags
