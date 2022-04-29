@@ -39,6 +39,27 @@ def getMoviesbyYear(db, value ):
     for record in cursor:
             print(record)
 
+def addMovie(db, titleValue, genreValue ):
+    collection = db.movies
+    id="_id"
+    title="title"
+    movieId = "movieId"
+    genres = 'genres'
+    genreValue = genreValue.split(",")
+    sortValue = -1
+    movieIdValue = 0
+    print(genreValue)
+    
+    cursor = collection.find().sort({movieId : sortValue}).limit(1)
+    for record in cursor:
+        movieIdValue = int(record["movieId"]) + 1
+    insertValue ={
+        movieId : movieIdValue,
+        title : titleValue,
+        genres : genreValue
+    }
+    print(insertValue)
+
 def getMoviesbyUserId(db, value ):
     collection = db.tags
     id="_id"
@@ -76,7 +97,7 @@ def fetch_popular_business(db):
 
 
 
-menu_option={1: 'Find Movie by ID', 2: 'Find Movie by Title',3: 'Find Movie by Genre.', 4: 'Find Movie by Year', 5:'Find Movie by User Id'}
+menu_option={1: 'Find Movie by ID', 2: 'Find Movie by Title',3: 'Find Movie by Genre.', 4: 'Find Movie by Year', 5:'Find Movie by User Id', 6: 'Insert a Movie'}
 def print_menu(menu_option):
     for key, value in menu_option.items():
         print(key,".", value)
@@ -112,4 +133,7 @@ if option==4:
 if option==5:
     value = int(input('Enter User ID: '))
     getMoviesbyUserId(db, value)
-
+if option==6:
+    titleValue = str(input('Enter Movie title (Please use "Title (Year)"): '))
+    genreValue = str(input('Enter Movie Genres (Please use "Genre1, Genre2"): '))
+    addMovie(db, titleValue, genreValue)
