@@ -54,7 +54,7 @@ def getMoviesbyUserId(db, value ):
         movieIdList.append(record['movieId'])
     ink = '$in'
     query = {movieId: { ink: movieIdList}}
-    projection={id:0, movieId :1 , title: 1}
+    projection={id:0, title: 1}
     cursor = collection.find(query, projection).limit(5)
     for record in cursor:
         print(record)
