@@ -1,5 +1,5 @@
 import pymongo
-
+from pymongo import MongoClient
 
 def getMoviesbyID(db, value ):
     collection = db.movies
@@ -9,17 +9,19 @@ def getMoviesbyID(db, value ):
     cursor = collection.find(query, projection).limit(5)
     for record in cursor:
             print(record)
+    menu(db)
+
 def getMoviesbyTitle(db, value ):
     collection = db.movies
     id="_id"
     title="title"
-    #qstr = "/" + str(value) + "/"
     regex = '$regex'
     query= {title: { regex: value}}
     projection={id:0}
     cursor = collection.find(query, projection).limit(5)
     for record in cursor:
             print(record)
+    menu(db)
 
 def getMoviesbyGenre(db, value ):
     collection = db.movies
@@ -29,7 +31,8 @@ def getMoviesbyGenre(db, value ):
     projection={id:0}
     cursor = collection.find(query, projection).limit(5)
     for record in cursor:
-            print(record)
+        print(record)
+    menu(db)
 
 def getMoviesbyYear(db, value ):
     collection = db.movies
@@ -40,7 +43,8 @@ def getMoviesbyYear(db, value ):
     projection={id:0}
     cursor = collection.find(query, projection).limit(5)
     for record in cursor:
-            print(record)
+        print(record)
+    menu(db)
 
 def addMovie(db, titleValue, genreValue ):
     collection = db.movies
@@ -66,8 +70,8 @@ def addMovie(db, titleValue, genreValue ):
     projection={id:0}
     cursor = collection.find(query, projection)
     for record in cursor:
-            print(record)
-
+        print(record)
+    menu(db)
 
 def getMoviesbyUserId(db, value ):
     collection = db.tags
@@ -80,7 +84,6 @@ def getMoviesbyUserId(db, value ):
     projection={id:0, movieId :1}
     cursor = collection.find(query, projection).limit(5)
     for record in cursor:
-        #record.split(":")
         movieIdList.append(record['movieId'])
     ink = '$in'
     query = {movieId: { ink: movieIdList}}
@@ -89,61 +92,85 @@ def getMoviesbyUserId(db, value ):
     cursor = collection.find(query, projection).limit(5)
     for record in cursor:
         print(record)
+    menu(db)
 
-def fetch_popular_business(db):
-    collection = db.yelpc
-    is_open="is_open"
+def getHighlyRatedMovies(db, limitValue ):
+    collection = db.ratings
+    rating='rating'
+    gte='$gte'
     id="_id"
-    name="name"
-    review_count="review_count"
-    query={is_open:1}
-    projection={name:1,id:0, review_count:1}
-    sort_query= {review_count:-1}
-    cursor = collection.find_one(sort=[("movieId", pymongo.DESCENDING)])
-    cursor = collection.find(query, projection).sort(review_count, -1).limit(5)
+    movieId="movieId"
+    title="title"
+    movieIdList = []
+    query= {rating:{gte:5}}
+    projection={movieId:1,id:0}
+    cursor = collection.find(query, projection).limit(limitValue)
     for record in cursor:
-            print(record)
+        movieIdList.append(record['movieId'])
+    ink = '$in'
+    query = {movieId: { ink: movieIdList}}
+    projection={id:0, title: 1}
+    collection = db.movies
+    cursor = collection.find(query, projection).limit(5)
+    for record in cursor:
+        print(record)
+    menu(db)
 
-
-
-
-menu_option={1: 'Find Movie by ID', 2: 'Find Movie by Title',3: 'Find Movie by Genre.', 4: 'Find Movie by Year', 5:'Find Movie by User Id', 6: 'Insert a Movie'}
-def print_menu(menu_option):
+def print_menu():
+    menu_option={
+        1: 'Find Movie by ID', 
+        2: 'Find Movie by Title',
+        3: 'Find Movie by Genre.', 
+        4: 'Find Movie by Year', 
+        5:'Find Movie by User Id', 
+        6: 'Insert a Movie', 
+        7: 'Find Highly Rated Movies', 
+        8: 'Exit'
+        }
     for key, value in menu_option.items():
         print(key,".", value)
-print_menu(menu_option)
-option = int(input('Enter your choice: '))
-print(option)
-
-from pymongo import MongoClient
-
-try:
-        conn = MongoClient("mongodb://127.0.0.1:27017")
-        print("Connected successfully!!!")
-except:
-        print("Could not connect to MongoDB")
-db = conn.moviesDB
-if option==1:
-    value = int(input('Enter movie id: '))
-
-    getMoviesbyID(db, value)
-if option==2:
-    value = str(input('Enter movie title: '))
-    getMoviesbyTitle(db, value)
 
 
-if option==3:
-    value = int(input('Enter movie genre: '))
-    getMoviesbyGenre(db, value)
+def menu(db):
+    print_menu()
+    option = int(input('Enter your choice: '))
+    print(option)
+    if option==1:
+        value = int(input('Enter movie id: '))
+        getMoviesbyID(db, value)
+    if option==2:
+        value = str(input('Enter movie title: '))
+        getMoviesbyTitle(db, value)
+    if option==3:
+        value = int(input('Enter movie genre: '))
+        getMoviesbyGenre(db, value)
+    if option==4:
+        value = str(input('Enter year: '))
+        getMoviesbyYear(db, value)
+    if option==5:
+        value = int(input('Enter User ID: '))
+        getMoviesbyUserId(db, value)
+    if option==6:
+        titleValue = str(input('Enter Movie title (Please use "Title (Year)"): '))
+        genreValue = str(input('Enter Movie Genres (Please use "Genre1, Genre2"): '))
+        addMovie(db, titleValue, genreValue)
+    if option==7:
+        limitValue = int(input('Enter limit: '))
+        getHighlyRatedMovies(db, limitValue)
+    if option==8:
+        print("Exiting menu.....")
 
-if option==4:
-    value = str(input('Enter year: '))
-    getMoviesbyYear(db, value)
 
-if option==5:
-    value = int(input('Enter User ID: '))
-    getMoviesbyUserId(db, value)
-if option==6:
-    titleValue = str(input('Enter Movie title (Please use "Title (Year)"): '))
-    genreValue = str(input('Enter Movie Genres (Please use "Genre1, Genre2"): '))
-    addMovie(db, titleValue, genreValue)
+
+def main():
+    try:
+            conn = MongoClient("mongodb://127.0.0.1:27017")
+            print("Mongo db Connected successfully!!!")
+    except:
+            print("Could not connect to MongoDB")
+    
+    db = conn.moviesDB
+    menu(db)
+
+if __name__ == "__main__":
+    main()
