@@ -55,6 +55,7 @@ def getMoviesbyUserId(db, value ):
     ink = '$in'
     query = {movieId: { ink: movieIdList}}
     projection={id:0, title: 1}
+    collection = db.movies
     cursor = collection.find(query, projection).limit(5)
     for record in cursor:
         print(record)
