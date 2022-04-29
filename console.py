@@ -55,6 +55,7 @@ def addMovie(db, titleValue, genreValue ):
     cursor = collection.find().sort({"movieId" : pymongo.DESCENDING}).limit(1)
     for record in cursor:
         movieIdValue = int(record["movieId"]) + 1
+    print(movieIdValue)
     insertValue ={
         movieId : movieIdValue,
         title : titleValue,
@@ -92,6 +93,7 @@ def fetch_popular_business(db):
     query={is_open:1}
     projection={name:1,id:0, review_count:1}
     sort_query= {review_count:-1}
+    cursor = collection.find_one(sort=[("movieId", pymongo.DESCENDING)])
     cursor = collection.find(query, projection).sort(review_count, -1).limit(5)
     for record in cursor:
             print(record)
