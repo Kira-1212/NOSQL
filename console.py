@@ -6,42 +6,42 @@ def getMoviesbyID(db, value ):
     movieId='movieId'
     query= {movieId: value}
     projection={id:0}
-    cursor = collection.find(query, projection).limit(5)
+    cursor = collection.find(query, projection)
     for record in cursor:
             print(record)
     menu(db)
 
-def getMoviesbyTitle(db, value ):
+def getMoviesbyTitle(db, value, limitValue ):
     collection = db.movies
     id="_id"
     title="title"
     regex = '$regex'
     query= {title: { regex: value}}
     projection={id:0}
-    cursor = collection.find(query, projection).limit(5)
+    cursor = collection.find(query, projection).limit(limitValue)
     for record in cursor:
             print(record)
     menu(db)
 
-def getMoviesbyGenre(db, value ):
+def getMoviesbyGenre(db, value, limitValue ):
     collection = db.movies
     id="_id"
     genres="genres"
     query= {genres: value}
     projection={id:0}
-    cursor = collection.find(query, projection).limit(5)
+    cursor = collection.find(query, projection).limit(limitValue)
     for record in cursor:
         print(record)
     menu(db)
 
-def getMoviesbyYear(db, value ):
+def getMoviesbyYear(db, value, limitValue ):
     collection = db.movies
     id="_id"
     title="title"
     regex = '$regex'
     query= {title: { regex: value}}
     projection={id:0}
-    cursor = collection.find(query, projection).limit(5)
+    cursor = collection.find(query, projection).limit(limitValue)
     for record in cursor:
         print(record)
     menu(db)
@@ -73,7 +73,7 @@ def addMovie(db, titleValue, genreValue ):
         print(record)
     menu(db)
 
-def getMoviesbyUserId(db, value ):
+def getMoviesbyUserId(db, value , limitValue):
     collection = db.tags
     id="_id"
     userid="userId"
@@ -82,7 +82,7 @@ def getMoviesbyUserId(db, value ):
     movieIdList = []
     query= {userid: value}
     projection={id:0, movieId :1}
-    cursor = collection.find(query, projection).limit(5)
+    cursor = collection.find(query, projection).limit(limitValue)
     for record in cursor:
         movieIdList.append(record['movieId'])
     ink = '$in'
@@ -111,21 +111,66 @@ def getHighlyRatedMovies(db, limitValue ):
     query = {movieId: { ink: movieIdList}}
     projection={id:0, title: 1}
     collection = db.movies
-    cursor = collection.find(query, projection).limit(5)
+    cursor = collection.find(query, projection)
+    for record in cursor:
+        print(record)
+    menu(db)
+
+def getLowlyRatedMovies(db, limitValue ):
+    collection = db.ratings
+    rating='rating'
+    lte='$lte'
+    id="_id"
+    movieId="movieId"
+    title="title"
+    movieIdList = []
+    query= {rating:{lte:0.5}}
+    projection={movieId:1,id:0}
+    cursor = collection.find(query, projection).limit(limitValue)
+    for record in cursor:
+        movieIdList.append(record['movieId'])
+    ink = '$in'
+    query = {movieId: { ink: movieIdList}}
+    projection={id:0, title: 1}
+    collection = db.movies
+    cursor = collection.find(query, projection)
+    for record in cursor:
+        print(record)
+    menu(db)
+
+def getMoviebyRating(db, value, limitValue ):
+    collection = db.ratings
+    rating='rating'
+    id="_id"
+    movieId="movieId"
+    title="title"
+    movieIdList = []
+    query= {rating: value}
+    projection={movieId:1,id:0}
+    cursor = collection.find(query, projection).limit(limitValue)
+    for record in cursor:
+        movieIdList.append(record['movieId'])
+    ink = '$in'
+    query = {movieId: { ink: movieIdList}}
+    projection={id:0, title: 1}
+    collection = db.movies
+    cursor = collection.find(query, projection)
     for record in cursor:
         print(record)
     menu(db)
 
 def print_menu():
     menu_option={
-        1: 'Find Movie by ID', 
-        2: 'Find Movie by Title',
-        3: 'Find Movie by Genre.', 
-        4: 'Find Movie by Year', 
-        5:'Find Movie by User Id', 
+        1: 'Find Movies by ID', 
+        2: 'Find Movies by Title',
+        3: 'Find Movies by Genre.', 
+        4: 'Find Movies by Year', 
+        5:'Find Movies by User Id', 
         6: 'Insert a Movie', 
         7: 'Find Highly Rated Movies', 
-        8: 'Exit'
+        8: 'Find Lowly Rated Movies',
+        9: 'Find Movies by Rating',
+        10: 'Exit'
         }
     for key, value in menu_option.items():
         print(key,".", value)
@@ -140,16 +185,20 @@ def menu(db):
         getMoviesbyID(db, value)
     if option==2:
         value = str(input('Enter movie title: '))
-        getMoviesbyTitle(db, value)
+        limitValue = int(input('Enter limit: '))
+        getMoviesbyTitle(db, value, limitValue)
     if option==3:
         value = int(input('Enter movie genre: '))
-        getMoviesbyGenre(db, value)
+        limitValue = int(input('Enter limit: '))
+        getMoviesbyGenre(db, value, limitValue)
     if option==4:
         value = str(input('Enter year: '))
-        getMoviesbyYear(db, value)
+        limitValue = int(input('Enter limit: '))
+        getMoviesbyYear(db, value, limitValue)
     if option==5:
         value = int(input('Enter User ID: '))
-        getMoviesbyUserId(db, value)
+        limitValue = int(input('Enter limit: '))
+        getMoviesbyUserId(db, value, limitValue)
     if option==6:
         titleValue = str(input('Enter Movie title (Please use "Title (Year)"): '))
         genreValue = str(input('Enter Movie Genres (Please use "Genre1, Genre2"): '))
@@ -158,6 +207,13 @@ def menu(db):
         limitValue = int(input('Enter limit: '))
         getHighlyRatedMovies(db, limitValue)
     if option==8:
+        limitValue = int(input('Enter limit: '))
+        getLowlyRatedMovies(db, limitValue)
+    if option==9:
+        value = int(input('Enter Rating: '))
+        limitValue = int(input('Enter limit: '))
+        getMoviebyRating(db, value, limitValue)
+    if option==10:
         print("Exiting menu.....")
 
 
