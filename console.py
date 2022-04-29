@@ -10,8 +10,9 @@ def getMoviesbyTitle(db, value ):
     collection = db.movies
     id="_id"
     title="title"
-    qstr = "/" + str(value) + "/"
-    query= {title: qstr}
+    #qstr = "/" + str(value) + "/"
+    regex = '$regex'
+    query= {title: { regex: value}}
     projection={id:0}
     cursor = collection.find(query, projection).limit(5)
     for record in cursor:
@@ -31,9 +32,8 @@ def getMoviesbyYear(db, value ):
     collection = db.movies
     id="_id"
     title="title"
-    qstr = "/" + str(value) + "/"
-    print(qstr)
-    query= {title: value}
+    regex = '$regex'
+    query= {title: { regex: value}}
     projection={id:0}
     cursor = collection.find(query, projection).limit(5)
     for record in cursor:
