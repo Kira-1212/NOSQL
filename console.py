@@ -189,39 +189,48 @@ def print_menu():
 def menu(db):
     print_menu()
     option = int(input('Enter your choice: '))
-    print(option)
+    print("Entered Option: ", option)
     if option==1:
         value = int(input('Enter movie id: '))
+        print("============================================================================")
         getMoviesbyID(db, value)
     if option==2:
         value = str(input('Enter movie title: '))
         limitValue = int(input('Enter limit: '))
+        print("============================================================================")
         getMoviesbyTitle(db, value, limitValue)
     if option==3:
         value = str(input('Enter movie genre: '))
         limitValue = int(input('Enter limit: '))
+        print("============================================================================")
         getMoviesbyGenre(db, value, limitValue)
     if option==4:
         value = str(input('Enter year: '))
         limitValue = int(input('Enter limit: '))
+        print("============================================================================")
         getMoviesbyYear(db, value, limitValue)
     if option==5:
         value = int(input('Enter User ID: '))
         limitValue = int(input('Enter limit: '))
+        print("============================================================================")
         getMoviesbyUserId(db, value, limitValue)
     if option==6:
         titleValue = str(input('Enter Movie title (Please use "Title (Year)"): '))
         genreValue = str(input('Enter Movie Genres (Please use "Genre1, Genre2"): '))
+        print("============================================================================")
         addMovie(db, titleValue, genreValue)
     if option==7:
         limitValue = int(input('Enter limit: '))
+        print("============================================================================")
         getHighlyRatedMovies(db, limitValue)
     if option==8:
         limitValue = int(input('Enter limit: '))
+        print("============================================================================")
         getLowlyRatedMovies(db, limitValue)
     if option==9:
         value = int(input('Enter Rating: '))
         limitValue = int(input('Enter limit: '))
+        print("============================================================================")
         getMoviesbyRating(db, value, limitValue)
     if option==10:
         print("Exiting menu.....")
