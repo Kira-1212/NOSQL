@@ -101,7 +101,7 @@ if option==4:
     value = str(input('Enter year: '))
     getMoviesbyYear(db, value)
 
-if option==4:
+if option==5:
     value = int(input('Enter User ID: '))
     getMoviesbyUserId(db, value)
 
