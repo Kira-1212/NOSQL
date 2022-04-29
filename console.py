@@ -44,6 +44,7 @@ def getMoviesbyUserId(db, value ):
     id="_id"
     userid="userId"
     movieId='movieId'
+    title="title"
     movieIdList = []
     query= {userid: value}
     projection={id:0, movieId :1}
@@ -51,7 +52,12 @@ def getMoviesbyUserId(db, value ):
     for record in cursor:
         #record.split(":")
         movieIdList.append(record['movieId'])
-    print(movieIdList)
+    ink = '$in'
+    query = {movieId: { ink: movieIdList}}
+    projection={id:0, movieId :1 , title: 1}
+    cursor = collection.find(query, projection).limit(5)
+    for record in cursor:
+        print(record)
 
 def fetch_popular_business(db):
     collection = db.yelpc
