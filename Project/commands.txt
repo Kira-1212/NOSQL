@@ -1,0 +1,187 @@
+docker exec -it mynode bash
+
+docker exec -it mongo bash
+
+git clone https://github.com/Kira-1212/nosql.git  
+
+mongoimport --db moviesDB --collection movies  --file movies.json --jsonArray
+mongoimport --db dbtest --collection tags  --file tags.json --jsonArray
+mongoimport --db dbtest --collection ratings  --file ratings.json --jsonArray
+
+mongoimport --type csv -d moviesDB -c movies --headerline movies.csv  
+
+docker cp /tmp/config.ini grafana:/usr/share/grafana/conf/
+sudo service mongod start
+
+db.movies.find().forEach(function (el) { el.genres = el.genres.split('|'); db.movies.update({ movieId :el.movieId}, {$set : {genres : el.genres }}); });
+
+db.movies.find({title:{$in: movieIds}}) 
+db.movies.find({title:{$in: db.tags.find({userId: 4}, {_id: 0,movieId:1})}}) 
+db.tags.find({userId: 4}, {_id: 0,movieId:1})   
+
+mongoimport --type csv -d moviesDB -c movies --headerline ratings.csv 
+
+db.ratings.find().sort({rating:-1}).limit(1)
+
+	• 5 instances
+		○ 3 shards = shard0Instance, shard1Instance, shard2Instance
+			§ each shard has 3 members in replica set
+			§ 
+		○ 1 mongos for all = mongosInstance
+		○ 1 for 3 config servers = configInstance
+
+	• a sharding system consisting of three shards
+	• one mongos
+	• replica set consisting of three config servers
+	
+ubuntu@ip-172-31-84-178:~$ nc -vz 3.86.213.197 26000
+Connection to 3.86.213.197 26000 port [tcp/*] succeeded!
+
+cd C:\MyStuff\Courses\nosql   
+
+git clone https://github.com/sriyabalineni/nosql.git
+cd nosql
+chmod +x install_mongo.sh 
+sudo ./install_mongo.sh
+sudo service mongod start 
+mongosh
+
+
+configInstance
+ssh -i C:\MyStuff\Courses\nosql\biryani.pem ubuntu@3.238.108.225
+
+mongosInstance
+ssh -i C:\MyStuff\Courses\nosql\biryani.pem ubuntu@44.199.241.48
+
+shard0Instance
+ssh -i C:\MyStuff\Courses\nosql\biryani.pem ubuntu@3.238.183.218
+
+shard1Instance
+ssh -i C:\MyStuff\Courses\nosql\biryani.pem ubuntu@44.200.51.115
+
+shard2Instance
+ssh -i C:\MyStuff\Courses\nosql\biryani.pem ubuntu@34.237.144.31
+
+
+ssh -i C:\MyStuff\Courses\nosql\biryani.pem ubuntu@52.90.254.226
+
+
+configInstanceb2
+	• sudo mkdir -p /db/config/data/db0 /db/config/data/db1 /db/config/data/db2
+	• in three different windows, start port as config server
+		○ sudo mongod --bind_ip 172.31.31.133 --port 27022 --configsvr --replSet config --dbpath /db/config/data/db0 --fork --syslog
+		○ sudo mongod --bind_ip 172.31.31.133 --port 27023 --configsvr --replSet config --dbpath /db/config/data/db1 --fork --syslog
+		○ sudo mongod --bind_ip 172.31.31.133 --port 27024 --configsvr --replSet config --dbpath /db/config/data/db2 --fork --syslog
+
+configInstance = initalize replica set
+	• mongosh --port 27022 --host 172.31.31.133
+	• rs.initiate()
+	• rs.add("172.31.31.133:27023");
+	• rs.add("172.31.31.133:27024");
+	• rs.status()
+
+mongosInstance
+	• mongos --configdb config/172.31.31.133:27022,172.31.31.133:27023,172.31.31.133:27024 --port 27021 --bind_ip 172.31.17.147
+		○ starts mongos for cong replSet
+
+
+sudo rm -rf a0 a1 a2  
+
+sudo rm -rf log.*
+ssh -i C:\MyStuff\Courses\nosql\biryani.pem ubuntu@52.91.219.246
+shard0Instance = configure replica sets for each shard
+	• mkdir a0 a1 a2 
+		○ where each member are replicas
+	• sudo mongod --shardsvr --replSet a --dbpath a0 --port 26000 --fork --logpath log.a0 --bind_ip 172.31.30.172
+	• sudo mongod --shardsvr --replSet a --dbpath a1 --port 26001 --fork --logpath log.a1 --bind_ip 172.31.30.172
+	• sudo mongod --shardsvr --replSet a --dbpath a2 --port 26002 --fork --logpath log.a2  --bind_ip 172.31.30.172
+	• mongosh --port 26000 --host 172.31.30.172
+	• rs.initiate()
+		○ connect to one member of replSet and initiate replSet, then add rest of member to replSet
+	• rs.add("172.31.30.172:26001");
+	• rs.add("172.31.30.172:26002");
+	• rs.status()
+
+ssh -i C:\MyStuff\Courses\nosql\biryani.pem ubuntu@54.242.21.250
+sudo rm -rf  b0 b1 b2
+shard1Instance
+	• mkdir b0 b1 b2
+	• mongod --shardsvr --replSet b --dbpath b0 --port 26100 --fork --logpath log.b0 --bind_ip 172.31.23.102
+	• mongod --shardsvr --replSet b --dbpath b1 --port 26101 --fork --logpath log.b1 --bind_ip 172.31.23.102
+	• mongod --shardsvr --replSet b --dbpath b2 --port 26102 --fork --logpath log.b2 --bind_ip 172.31.23.102
+	• mongosh --port 26100 --host 172.31.23.102
+	• rs.initiate()
+	• > rs.add("172.31.23.102:26101");
+	• > rs.add("172.31.23.102:26102");
+	• > rs.status()
+	
+sudo rm -rf c0 c1 c2
+sudo rm -rf log.*
+
+ssh -i C:\MyStuff\Courses\nosql\biryani.pem ubuntu@18.206.168.111
+shard2Instance
+	• mkdir c0 c1 c2
+	• mongod --shardsvr --replSet c --dbpath c0 --port 26200 --fork --logpath log.c0 --bind_ip 172.31.19.172
+	• mongod --shardsvr --replSet c --dbpath c1 --port 26201 --fork --logpath log.c1 --bind_ip 172.31.19.172
+	• mongod --shardsvr --replSet c --dbpath c2 --port 26202 --fork --logpath log.c2 --bind_ip 172.31.19.172
+	• $ mongosh --port 26200 --host 172.31.19.172
+	• > rs.initiate()
+	• > rs.add("172.31.19.172:26201");
+	• > rs.add("172.31.19.172:26202");
+	• > rs.status()
+	
+	
+ssh -i C:\MyStuff\Courses\nosql\biryani.pem ubuntu@52.23.182.231
+mongosInstance = make sure to download mongodb-org
+	• sudo mongosh --port 27021 --host 172.31.17.147
+		○ connect to mongos and add shards
+	• sh.addShard("a/172.31.30.172:26000")
+	• sh.addShard("b/172.31.23.102:26100")
+	• sh.addShard("c/172.31.19.172:26200")
+	• sh.status()
+	• sh.enableSharding("moviesDB")
+	• sh.shardCollection( "moviesDB.movies", { "movieId" : "hashed" } )
+	• sh.shardCollection( "moviesDB.ratings", { "userId" : "hashed" } )
+	• sh.shardCollection( "moviesDB.tags", { "userId" : "hashed" } )
+
+wget https://files.grouplens.org/datasets/movielens/ml-25m.zip
+
+sudo apt install unzip    
+
+mongoimport --type csv -d moviesDB -c movies --headerline movies.csv --host 172.31.17.147 --port 27021
+
+mongoimport --type csv -d moviesDB -c ratings --headerline ratings.csv --host 172.31.17.147 --port 27021
+
+mongoimport --type csv -d moviesDB -c tags --headerline tags.csv --host 172.31.17.147 --port 27021
+
+mongoimport --type csv -d moviesDB -c tags --headerline tags.csv  --port 27021 --numInsertionWorkers 500 --batchSize 1000
+mongoimport --type csv -d moviesDB -c movies --headerline movies.csv  --port 27021 --numInsertionWorkers 500 --batchSize 1000
+mongoimport --type csv -d moviesDB -c ratings --headerline ratings.csv  --port 27021 --numInsertionWorkers 500 --batchSize 1000
+
+
+mongoimport --type csv -d moviesDB -c tags --headerline tags.csv --numInsertionWorkers 500 --batchSize 1000
+mongoimport --type csv -d moviesDB -c movies --headerline movies.csv  --port 27021 --numInsertionWorkers 500 --batchSize 1000
+mongoimport --type csv -d moviesDB -c ratings --headerline ratings.csv  --port 27021 --numInsertionWorkers 500 --batchSize 1000
+2518950
+	shard0Instance
+
+	• mongosh 172.31.31.236:26000
+		○ populate data in [direct: primary] test
+	• use testdb
+	• db.testcollection.countDocuments()
+
+sudo mkdir sampleData
+cd sampleData
+sudo git clone https://github.com/neelabalan/mongodb-sample-dataset.git
+cd mongodb-sample-dataset/sample_analytics
+
+mongos instance
+sudo mongoimport --db sampleAnalytics --collection accounts --file accounts.json --host 172.31.31.151 --port 27021
+
+sudo mongoimport --db sampleAnalytics --collection customers --file customers.json --host 172.31.31.151 --port 27021
+
+sudo mongoimport --db sampleAnalytics --collection transactions --file transactions.json --host 172.31.31.151 --port 27021
+
+db.movies.getShardDistribution()
+db.customers.getShardDistribution()
+db.transactions.getShardDistribution()

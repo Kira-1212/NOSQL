@@ -1,0 +1,66 @@
+docker run -itd --name cnode cassandra:3.11
+docker ps -a
+docker exec -it cnode bash
+
+git clone https://github.com/Kira-1212/nosql.git  
+
+docker run -itd --name cass cassandra:3.11  
+
+docker exec -it cass bash
+
+cd nosql/Cassandra/
+
+cqlsh
+
+CREATE KEYSPACE demo
+WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};
+
+use demo;
+
+create table citylist(city varchar,loc List <float>,pop int,state varchar,zip varchar,primary key (state,city,zip));
+
+COPY demo.citylist(zip, city, pop,state,loc) FROM 'zips.csv' WITH DELIMITER=',' AND HEADER = true;
+
+select * from citylist limit 15;
+
+5
+SELECT * FROM citylist WHERE city = 'NEWYORK' LIMIT 15 ALLOW FILTERING;
+
+CREATE INDEX cy ON citylist (city);
+
+SELECT * FROM citylist WHERE city="NEW YORK";
+
+CREATE MATERIALIZED VIEW city_new_york AS SELECT state,city,zip,loc,pop FROM citylist WHERE city = 'NEW YORK' AND zip IS NOT NULL PRIMARY KEY (city,state,zip); 
+
+select * from city_new_york limit 15;
+
+drop index cy 
+
+6
+select * from citylist where city = 'NEW YORK' and pop > 20000 and pop < 30000 limit 15 ALLOW FILTERING; 
+
+CREATE INDEX cy ON citylist (city); 
+select * from citylist where city = 'NEW YORK' and pop > 20000 and pop < 30000 limit 15
+
+select * from city_new_york where pop > 20000 and pop < 30000 limit 15;  
+
+
+7
+
+create table citylist2(city varchar,loc List <float>,pop int,state varchar,zip varchar,primary key (state,city,zip))
+WITH CLUSTERING ORDER BY (city ASC, zip DESC );
+
+select * from citylist2 limit 15;
+
+8
+
+COPY demo.citylist2(zip, city, pop,state,loc) FROM 'zips.csv' WITH DELIMITER=',' AND HEADER = true;
+
+select * from citylist2 limit 15;
+
+9.
+
+select zip from citylist2 where state ='CA' limit 15 ;
+
+10.
+
