@@ -1,0 +1,250 @@
+1. Compare the consistency of ACID properties to that of the CAP theorem.
+
+Solution:
+
+Database rules are the most prominent part of ACID consistency. A consistent system will ensure the uniqueness of a value across all operations 
+if a schema indicates that it must be unique. If a foreign key implies that removing one row deletes related rows, a consistent system
+ensures that the state can't contain corresponding rows once the base row is destroyed.
+
+CAP consistency guarantees that in a distributed system, every replica of the same logical value has the same value at all times. 
+This is a logical rather than a physical assurance. It's possible that replicating values throughout a cluster will take some time 
+that isn't zero downtime. Nevertheless, the cluster can give a logical picture by preventing clients from accessing different values at separate nodes.
+
+When systems provide more than simple key-value storage, the most interesting combination of these principles happens. When systems in a cluster 
+satisfy some or all of the ACID features, CAP consistency becomes more complicated. If a system provides repeatable reads, compare-and-set, or 
+complete transactions, it must provide such assurances at all nodes to be CAP consistent. This is why systems that prioritize CAP availability 
+above CAP consistency are unlikely to deliver these benefits.
+
+
+2. Explain the trade-off between isolation level and latency in relational database systems.
+
+Solution:
+
+Isolation is about the extent (isolation level) to which a transaction is isolated from other transactions.
+
+There are four isolation levels, as follows:
+
+READ UNCOMMITTED: UserA will see the change made by UserB. This isolation level is called dirty reads, which means that read data is inconsistent.
+Other parts of the table or the query may not yet have been committed. This isolation level ensures the quickest performance, as data is read
+directly from the table’s blocks without further processing, verifications, or other validation. The process is fast, and the data is as dirty as it can get.
+
+READ COMMITTED: UserA will not see the change made by UserB. This is because in the READ COMMITTED isolation level, the rows returned by a query are the 
+rows that were committed when the query was started. The change made by UserB was not present when the query started and, therefore, will not be included
+in the query result.
+
+REPEATABLE READ: UserA will not see the change made by UserB. In the REPEATABLE READ isolation level, the rows returned by a query are the rows 
+that were committed when the transaction was started. The change made by UserB was not present when the transaction was started and, therefore, will not be included
+in the query result. This means that “All consistent reads within the same transaction read the snapshot established by the first read.” 
+
+SERIALIZABLE: This isolation level specifies that all transactions occur in a completely isolated fashion, meaning as if all transactions in the system were executed
+serially, one after the other. The DBMS can execute two or more transactions simultaneously only if the illusion of serial execution can be maintained.
+
+It can be observed that as we increase the levels of isolation, the data becomes more consistent, but this comes with a trade-off, i.e., latency.
+The default isolation level in most database systems is REPEATABLE READ, which provides relatively high isolation. 
+Because old row data values are needed for current queries, databases separate old row values and snapshots.
+Each row is checked during query execution, and if it is too new, an older version of this row is taken from the rollback segment to make up 
+the query result. The completion of this examination, lookup, and compromise action chain takes time, resulting in a performance penalty. There's also a 
+snowball effect. Updates occur during a query, slowing it down and increasing the amount of time it takes. More updates arrive throughout the time it 
+takes to process the query, lengthening the query execution time even more! So if we want our data to be consistent, we have to pay the cost of delay in execution.
+
+3. Writes on databases are first done in memory and then persisted in the disk. This principle is applied to the process of writing data as well as that of 
+writing corresponding logs. Consider this principle to answer this question.
+Explain how a database system handles writes (e.g., Update X with Y)in terms of the following actions:
+
+	- The log entry of this update is written in the memory.
+	- Data is updated in memory.
+	- The log entry is persisted on disk. 
+	- Updated data is persisted on disk.
+
+Solution:
+
+Write-ahead logging (WAL) is a set of strategies for ensuring atomicity and durability in database systems (two ACID qualities). Before the changes
+are put to the database, they are first logged in the log, which must be written to stable storage.
+Before any changes are applied in a system that uses WAL, they are written to a log. In most cases, the log stores both redo and undo information.
+
+The scenario Update X with Y is a classic case of WAL.
+
+Actions performed:
+
+	- The log entry of this update is written in the memory.
+	- The log entry is persisted on disk. 
+	- Data is updated in memory.
+	- Updated data is persisted on disk.
+
+4. Explain why JDBC is not considered object-oriented.
+
+Solution:
+
+JDBC is Java Database Connectivity. JDBC is a way to connect to the database using Java.
+
+In general, to process any SQL statement with JDBC, we have to follow these steps:
+
+- Establishing a connection.
+- Create a statement.
+- Execute the query.
+- Process the ResultSet object.
+- Close the connection.
+
+We use the Connection class object to establish the connection, and then we need a SQL statement to execute the query. To generate the SQL statement, we 
+need to know the schema of the database. Execution of an improper SQL statement will throw an exception. This is an additional overhead, which has
+nothing to do with the OOPS concept. Thus, JDBC is not considered object-oriented.
+
+5. Compare hash partitioning and range partitioning of NoSQL database systems.
+
+Solution:
+
+NoSQL database systems are distributed. Data must be partitioned using a partitioning key within the data. The primary key or any other unique key can be used as the partitioning key. 
+After the partitioning key is found, we'll need to figure out how to assign a key to each shard.
+
+Using a hash function on a key is one approach to accomplish this. The key would be given to a shard based on the hash bucket and the number of shards to 
+map keys into. When nodes join or depart the cluster, an assignment scheme based on a modulo by the number of nodes currently in the cluster will result
+in a lot of data movement (since all of the assignments need to be recalculated).
+
+Another option for doing assignments is to divide the entire keyspace into a series of ranges. Each range corresponds to a shard and is associated with a 
+particular cluster node. Given a key, a binary search would be performed to determine which node it should be given to. A range partition does not have the same 
+churn problem as a naive hashing technique. Shards from existing nodes will migrate to the new node when it joins. When a node goes down, its shards will 
+move to one of the other nodes.
+
+A decentralized hash-based assignment can be developed in which all nodes are peers, and there are no special master-slave interactions between nodes. 
+On the other hand, a range-based partitioning strategy necessitates the storage of range assignments in a dedicated service. 
+As a result, databases that use range-based partitioning are typically centralized and peer-to-peer, with nodes with specific tasks and duties.
+
+6. Explain schema-on-read and schema-on-write along with one example of a database system for each.
+
+Solution: 
+
+In traditional databases, the table's schema is enforced during data loading, and if the data being loaded does not match the schema, it is rejected; 
+this is known as Schema-on-Write. Data is checked against the schema before being written into the database. Because the data is already loaded in a 
+specific format, it aids query performance.
+Relational database systems have a strict schema on write. MySQL
+
+It is not necessary to have a schema in Schema-on-Read. Because the data does not have to follow any internal format, it aids in a rapid initial data load. 
+It provides data storage independence and flexibility as compared to schema-on-write. The applications fetching the data have to enforce the rules on data.
+NoSQL database systems make use of schema on read. MongoDB
+
+7. What is the main difference between key-value stores and document stores? How does this difference affect the ability of the database to query data and 
+to create an index?
+
+Solution:
+
+A key-value store is a global collection of key-value pairs that provides the simplest feasible data model. It's a type of storage system that keeps track 
+of values that are indexed by a key. The aggregate in a key-value store is hidden from the database. You're only able to search by key. As a result, the 
+store does not know the data. An aggregate's value can be obtained via its key. This helps in reading and writing quickly.
+
+The key-value model is extended by a document store, which stores values in a structured way. The database in document storage is aware of the aggregate's 
+internal structure. The store is not limited to querying by key because the data is transparent and can conduct additional activities. Database access is 
+more flexible, as it can only obtain a portion of the aggregate rather than the entire thing. The aggregate contents can be used to generate indexes in 
+the database.
+
+8. Column-oriented databases are often deployed to support OLAP applications. Present an example SQL query based on a star schema and explain how a 
+column-oriented database can efficiently support this query.
+
+Solution:
+
+Let us consider a star schema with Revenue as a Fact table and Date, Dealer, Branch, and Product as Dimensional tables.
+
+Revenue : Dealer_ID, Model_ID, Branch_ID, Date_ID, Units_Sold, Revenue
+Date: Date_ID, Year, Month, Quarter, Date
+Dealer: Dealer_ID, Location_ID, Country_id, Dealer_Name, Dealer_Contact
+Branch: Branch_ID, Name, Address, Country
+Product: Product_ID, Product_Name, Model_ID, Variant_ID 
+
+Query to generate the details of a particular Model:
+
+select * from Revenue r, Date dt, Dealer d, Branch b, Product p
+where r.Dealer_id = d.Dealer_id and r.Date_ID = dt.Date_ID and r.Model_ID = p.Model_ID and r.Branch_ID = b.Branch_ID
+and dt.Year = 2019 and p.Model_ID = "12343"
+
+A columnar database stores data by columns rather than by rows, making it suitable for analytical query processing. In this case, the query pulls 
+data from different columns of the table. Storage systems have to pull data from physical disk drives, which store information magnetically on 
+spinning platters using read/write heads that move around to find data that users request. The less the heads have to move, the faster the drive 
+performs. If data is kept closer together, minimizing seek time, systems can deliver that data faster.
+
+Since column-oriented databases store each column in one or more contiguous blocks, the retrieval is fast and supports the query efficiently.
+
+9. Explain the trade-off between consistency level and availability of distributed database systems in the context of the CAP theorem.
+
+Solution:
+
+Consistency, Availability, and Partition Tolerance are the three pillars of the CAP theorem. It states that a system can only have two of the three 
+qualities stated above in a distributed database context. Partition tolerance is no longer a choice in the current world, as systems in a distributed 
+environment must always be partition tolerant.
+As a result, it simply means that a system can only have one of two properties: consistency or availability.
+
+In applications where several clients must view the same data simultaneously, and all of them should have the same view, consistency is 
+prioritized. In such instances, availability may be jeopardized, as the system does not have to be present all of the time but must maintain consistency.
+
+In applications with a large amount of data accumulation, availability is paramount. In such circumstances, the data does not need to be consistent among 
+all users, but the system must be available at all times because there is too much data to lose.
+
+10. Select a NoSQL database system of your choice that follows the aggregate data model. Answer the following questions specific to the system you selected. 
+Exclude MongoDB and Cassandra from your choice.
+	- Explain its data model.
+	- Explain the unit of sharding (partitioning) and system replication.
+	- Is there any index created by the database by default? Briefly explain it.
+
+Solution:
+
+Bigtable is a NoSQL wide-column database optimized for heavy reads and writes developed by Google.
+
+Data Model:
+
+Bigtable stores data in sorted key/value maps stored in massively scalable tables. The table is made up of rows that each describe a single entity and 
+columns that contain the specific values for each row. A single row key is used to index each row, and columns that are linked to one another are usually 
+grouped together into a column family. The column family and a column qualifier, a unique name inside the column family, identify each column.
+
+Multiple cells can be found at each row/column junction. Each cell includes a unique timestamped version of the data for each row and column. 
+Keeping track of how the stored data for that row and column has changed over time by storing several cells in a column. 
+Bigtable tables are compact; it doesn't take up any room if a column isn't used in a row.
+
+Partitioning and Replication:
+
+The rows of a table are logically divided into many subtables called tablets. Within Bigtable, a tablet is a series of successive rows of a table that serves 
+as the distribution and load balancing unit. Because the table is always ordered alphabetically by row, reading short ranges of rows is quick.
+
+Bigtable employs a master-slave model for replication with the help of Chubby. Chubby is a distributed lock service that manages resource leases and keeps 
+configuration information. It is highly available and durable. The service has five active replicas, one chosen to serve requests as the master.
+For the service to work, a majority of people must be running. It employs the Paxos distributed consensus mechanism to keep the replicas reliably 
+synchronized. Chubby provides a file and directory namespace.
+
+Index:
+
+Each row has a single indexed value; this is the row key. Bigtable is suited for storing massive amounts of single-keyed data 
+in a low-latency environment. It has a high read and write throughput with low latency, making it an excellent data source for MapReduce. 
+
+Each table has only one index, the row key. There are no secondary indices. Each row key must be unique.
+Rows are sorted lexicographically by row key, from the lowest to the highest byte string. Row keys are sorted in big-endian byte order
+(sometimes called network byte order), the binary equivalent of alphabetical order.
+
+
+11. In your laptop, set up MongoDB in a single node using Ubuntu Docker image. The following instructions are posted under the Course Materials section to assist you.
+Setting up Docker and GIT on Mac
+Setting up Docker and GIT on Windows
+Setting up Docker on an old version of Windows
+MongoDB Single Node Setup in a Ubuntu Docker Container
+Run mongosh on the ubuntu container prompt and coy and paste the initial screen into hw1.txt. The initial screen should look like this:
+
+Solution:
+
+root@6129edca66ba:/tmp/service# sudo service mongod start
+Started mongod
+root@6129edca66ba:/tmp/service# sudo service mongod status
+mongod is running
+root@6129edca66ba:/tmp/service# mongosh
+Current Mongosh Log ID: 62108fc0932cb5d73817e41f
+Connecting to:          mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.1.9
+Using MongoDB:          5.0.6
+Using Mongosh:          1.1.9
+
+For mongosh info see: https://docs.mongodb.com/mongodb-shell/
+
+
+To help improve our products, anonymous usage data is collected and sent to MongoDB periodically (https://www.mongodb.com/legal/privacy-policy).
+You can opt-out by running the disableTelemetry() command.
+
+------
+   The server generated these startup warnings when booting:
+   2022-02-18T22:35:00.724-08:00: Access control is not enabled for the database. Read and write access to data and configuration is unrestricted
+   2022-02-18T22:35:00.724-08:00: You are running this process as the root user, which is not recommended
+   2022-02-18T22:35:00.725-08:00: /sys/kernel/mm/transparent_hugepage/enabled is 'always'. We suggest setting it to 'never'
+------
